@@ -16,16 +16,17 @@ type config struct {
 	startHour         int
 	rotateInterval    time.Duration
 	compress          bool
-	nowFunc           func() time.Time
 }
 
 // LogRotator rotates log files every (configured) time interval
 // It implements io.WriteCloser and checks for rotation on every Write call
 type LogRotator struct {
 	config
-	w        *bufio.Writer
-	f        *os.File
-	logStart time.Time
+	w              *bufio.Writer
+	f              *os.File
+	logStart       time.Time
+	nowFunc        func() time.Time
+	rotateCallback func(t time.Time)
 }
 
 func defaultLogRotator(filePath string) *LogRotator {
@@ -36,12 +37,12 @@ func defaultLogRotator(filePath string) *LogRotator {
 			header:            nil,
 			rotateInterval:    24 * time.Hour,
 			compress:          false,
-			nowFunc:           time.Now,
 		},
+		nowFunc: time.Now,
 	}
 }
 
-// New returns a LogRotator writing to files of fmt /your/path/<time-fmt>-yourfilename.log
+// New returns a LogRotator writing to files of fmt /your/path/<time-fmt>_yourfilename.log
 // @Input filePath: General filePath for log files. E.g. /your/path/yourfilename.log
 // @Input options: Provide configuration options while instantiating a LogRotator
 func New(filePath string, options ...OptFunc) (*LogRotator, error) {
@@ -107,7 +108,12 @@ func (lr *LogRotator) initLogStart() {
 }
 
 func (lr *LogRotator) shouldRotate() bool {
-	return lr.nowFunc().Sub(lr.logStart) > lr.rotateInterval
+	now := lr.nowFunc()
+	shouldRotate := now.Sub(lr.logStart) > lr.rotateInterval
+	if shouldRotate && lr.rotateCallback != nil {
+		lr.rotateCallback(now)
+	}
+	return shouldRotate
 }
 
 func (lr *LogRotator) rotate() error {

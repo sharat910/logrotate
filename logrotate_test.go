@@ -1,12 +1,13 @@
 package logrotator
 
 import (
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogRotator_Rotation(t *testing.T) {

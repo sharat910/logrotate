@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/sharat910/logrotator"
 )
@@ -11,6 +13,9 @@ func main() {
 		logrotator.StartHour(3),
 		logrotator.PrependTimeFormat("2006-01-02", "_"),
 		logrotator.Header([]byte("header\n")),
+		logrotator.RotateCallback(func(t time.Time) {
+			fmt.Println("Rotating logs", t)
+		}),
 	)
 	if err != nil {
 		log.Fatal(err)
