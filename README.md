@@ -5,7 +5,7 @@ A time-based rotating log writer for Golang.
 
 Let's say that a golang application writes continuous logs into `logs/example.log`. 
 It can use the `logrotate` package to split up the logs every (configurable) `rotateInterval` (defaults to 1 day) to create 
-multiple log files (e.g. `logs/2020-12-08-example.log`, `logs/2020-12-09-example.log`, and so on.).
+multiple log files (e.g. `logs/2020-12-08_example.log`, `logs/2020-12-09_example.log`, and so on.).
 
 Example usage: `cmd/example/main.go`
 

@@ -14,10 +14,10 @@ func WithCompression(lr *LogRotator) error {
 	return nil
 }
 
-// PrependTimeFormat sets the time fmt string which is added as prefix to filename
-func PrependTimeFormat(f string) OptFunc {
+// PrependTimeFormat sets the time fmt string and delim which is added as prefix to filename
+func PrependTimeFormat(tf string, delim string) OptFunc {
 	return func(rotator *LogRotator) error {
-		rotator.prependTimeFormat = f
+		rotator.prependTimeFormat = tf + delim
 		return nil
 	}
 }

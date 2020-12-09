@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/sharat910/logrotator"
 	"log"
+
+	"github.com/sharat910/logrotator"
 )
 
 func main() {
 	lr, err := logrotator.New("./logs/example.log",
 		logrotator.StartHour(3),
+		logrotator.PrependTimeFormat("2006-01-02", "_"),
 		logrotator.Header([]byte("header\n")),
 	)
 	if err != nil {

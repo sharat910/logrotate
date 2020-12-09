@@ -32,7 +32,7 @@ func defaultLogRotator(filePath string) *LogRotator {
 	return &LogRotator{
 		config: config{
 			filePath:          filePath,
-			prependTimeFormat: "2006-01-02",
+			prependTimeFormat: "2006-01-02_",
 			header:            nil,
 			rotateInterval:    24 * time.Hour,
 			compress:          false,
@@ -150,6 +150,6 @@ func (lr *LogRotator) getFormattedFilepath(t time.Time) (string, error) {
 		return "", errors.New("unable to get filename from filepath")
 	}
 	prependTimeString := t.Format(lr.prependTimeFormat)
-	fp := filepath.Join(filepath.Dir(lr.filePath), fmt.Sprintf("%s-%s", prependTimeString, last))
+	fp := filepath.Join(filepath.Dir(lr.filePath), fmt.Sprintf("%s%s", prependTimeString, last))
 	return fp, nil
 }
