@@ -1,5 +1,7 @@
 # IntelliJ project files
 .idea
+test
+temp
 *.iml
 out
 gen

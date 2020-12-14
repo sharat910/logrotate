@@ -8,7 +8,3 @@ It can use the `logrotate` package to split up the logs every (configurable) `ro
 multiple log files (e.g. `logs/2020-12-08_example.log`, `logs/2020-12-09_example.log`, and so on.).
 
 Example usage: `cmd/example/main.go`
-
-#### TODO
-* Add more tests
-* Compress old logs

@@ -53,7 +53,8 @@ func New(filePath string, options ...OptFunc) (*LogRotator, error) {
 			return nil, err
 		}
 	}
-	err := lr.rotate()
+	lr.initLogStart()
+	err := lr.createLogWriter()
 	if err != nil {
 		return nil, err
 	}
@@ -118,16 +119,32 @@ func (lr *LogRotator) shouldRotate() bool {
 
 func (lr *LogRotator) rotate() error {
 
-	if lr.logStart.IsZero() {
-		lr.initLogStart()
-	} else {
-		lr.logStart = lr.logStart.Add(lr.rotateInterval)
-	}
-
 	if err := lr.Close(); err != nil {
 		return err
 	}
 
+	if lr.compress {
+		// Get the file just closed
+		oldfile, err := lr.getFormattedFilepath(lr.logStart)
+		if err != nil {
+			return err
+		}
+		if fileExists(oldfile) {
+			go Compress(oldfile, true)
+		}
+	}
+
+	lr.logStart = lr.logStart.Add(lr.rotateInterval)
+
+	err := lr.createLogWriter()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (lr *LogRotator) createLogWriter() error {
 	fp, err := lr.getFormattedFilepath(lr.logStart)
 	if err != nil {
 		return err
@@ -146,7 +163,6 @@ func (lr *LogRotator) rotate() error {
 			return err
 		}
 	}
-
 	return nil
 }
 
