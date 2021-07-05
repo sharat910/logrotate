@@ -8,6 +8,12 @@ import (
 // OptFunc sets configuration options for LogRotator
 type OptFunc func(lr *LogRotator) error
 
+// WithImmediateFlush enables flushing to file on every Write (useful for logs)
+func WithImmediateFlush(lr *LogRotator) error {
+	lr.immediateFlush = true
+	return nil
+}
+
 // WithCompression enables compression on closed log files
 func WithCompression(lr *LogRotator) error {
 	lr.compress = true

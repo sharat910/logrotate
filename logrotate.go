@@ -16,6 +16,7 @@ type config struct {
 	startHour         int
 	rotateInterval    time.Duration
 	compress          bool
+	immediateFlush    bool
 }
 
 // LogRotator rotates log files every (configured) time interval
@@ -69,7 +70,13 @@ func (lr *LogRotator) Write(p []byte) (n int, err error) {
 			return 0, err
 		}
 	}
-	return lr.w.Write(p)
+
+	n,err = lr.w.Write(p)
+
+	if lr.immediateFlush {
+		err = lr.Flush()
+	}
+	return
 }
 
 // Flush flushes the underlying bufio.Writer
@@ -79,7 +86,7 @@ func (lr *LogRotator) Flush() error {
 
 // Close flushes bufio.Writer and closes the log file
 func (lr *LogRotator) Close() error {
-	// Close existing writer
+	// Flush existing writer
 	if lr.w != nil {
 		err := lr.w.Flush()
 		if err != nil {
