@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"time"
 
@@ -12,7 +13,10 @@ func main() {
 	lr, err := logrotator.New("./logs/example.log",
 		logrotator.StartHour(3),
 		logrotator.PrependTimeFormat("2006-01-02", "_"),
-		logrotator.Header([]byte("header\n")),
+		logrotator.WithHeaderWriter(func(w io.Writer) error {
+			_, err := w.Write([]byte("header\n"))
+			return err}),
+		logrotator.WithImmediateFlush,
 		logrotator.RotateCallback(func(t time.Time) {
 			fmt.Println("Rotating logs", t)
 		}),

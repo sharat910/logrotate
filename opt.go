@@ -2,6 +2,7 @@ package logrotator
 
 import (
 	"errors"
+	"io"
 	"time"
 )
 
@@ -55,6 +56,15 @@ func RotateInterval(i time.Duration) OptFunc {
 func Header(h []byte) OptFunc {
 	return func(lr *LogRotator) error {
 		lr.header = h
+		return nil
+	}
+}
+
+// WithHeaderWriter sets a func that will be called on every new log file creation
+// Useful while rotating pcap files.
+func WithHeaderWriter(hw func(writer io.Writer) error) OptFunc {
+	return func(lr *LogRotator) error {
+		lr.headerWriter = hw
 		return nil
 	}
 }

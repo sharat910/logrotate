@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -17,6 +18,7 @@ type config struct {
 	rotateInterval    time.Duration
 	compress          bool
 	immediateFlush    bool
+	headerWriter func(w io.Writer) error
 }
 
 // LogRotator rotates log files every (configured) time interval
@@ -164,10 +166,17 @@ func (lr *LogRotator) createLogWriter() error {
 	}
 	lr.w = bufio.NewWriter(lr.f)
 
-	if lr.header != nil && !appendMode {
-		_, err := lr.w.Write(lr.header)
-		if err != nil {
-			return err
+	if !appendMode {
+		if lr.header != nil {
+			_, err := lr.w.Write(lr.header)
+			if err != nil {
+				return err
+			}
+		} else if lr.headerWriter != nil {
+			err := lr.headerWriter(lr.w)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
