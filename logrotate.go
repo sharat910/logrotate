@@ -18,7 +18,7 @@ type config struct {
 	rotateInterval    time.Duration
 	compress          bool
 	immediateFlush    bool
-	headerWriter func(w io.Writer) error
+	headerWriter      func(w io.Writer) error
 }
 
 // LogRotator rotates log files every (configured) time interval
@@ -73,7 +73,10 @@ func (lr *LogRotator) Write(p []byte) (n int, err error) {
 		}
 	}
 
-	n,err = lr.w.Write(p)
+	n, err = lr.w.Write(p)
+	if err != nil {
+		return
+	}
 
 	if lr.immediateFlush {
 		err = lr.Flush()
